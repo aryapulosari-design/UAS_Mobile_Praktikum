@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:langit_kita/models/air_quality.dart';
 import 'package:langit_kita/models/city.dart';
 import 'package:langit_kita/models/weather.dart';
 import 'package:langit_kita/utils/weather_display.dart';
@@ -6,6 +7,30 @@ import 'package:langit_kita/utils/weather_display.dart';
 import 'fixtures/weather_fixture.dart';
 
 void main() {
+  test('Rentang US AQI mencakup batas setiap kategori', () {
+    const expected = {
+      0: '0–50',
+      50: '0–50',
+      51: '51–100',
+      100: '51–100',
+      101: '101–150',
+      150: '101–150',
+      151: '151–200',
+      200: '151–200',
+      201: '201–300',
+      300: '201–300',
+      301: '301+',
+      550: '301+',
+    };
+    for (final entry in expected.entries) {
+      final data = AirQuality.fromJson({
+        'current': {'us_aqi': entry.key},
+      });
+      expect(data.level?.range, entry.value, reason: 'US AQI ${entry.key}');
+    }
+    expect(AirQuality.fromJson({}).level, isNull);
+  });
+
   test('Prakiraan per jam dan detail harian mempertahankan data API', () {
     final weather = Weather.fromJson(weatherFixture());
     expect(weather.hourly, hasLength(24));
@@ -41,6 +66,18 @@ void main() {
     final json = weatherFixture();
     (json['current'] as Map)['temperature_2m'] = 30;
     expect(Weather.fromJson(json).temperature, 30.0);
+  });
+
+  test('Sampel per jam null tetap kosong tanpa mengganggu jam lainnya', () {
+    final json = weatherFixture();
+    final hourly = json['hourly'] as Map;
+    for (final field in ['temperature_2m', 'precipitation_probability']) {
+      hourly[field] = List<num?>.of(hourly[field] as List<num>)..[1] = null;
+    }
+    final weather = Weather.fromJson(json);
+    expect(weather.hourly[1].temperature, isNull);
+    expect(weather.hourly[1].rainProbability, isNull);
+    expect(weather.hourly[2].temperature, 30);
   });
 
   test(

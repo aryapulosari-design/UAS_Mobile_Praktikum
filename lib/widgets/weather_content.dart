@@ -7,10 +7,16 @@ import '../screens/daily_detail_screen.dart';
 import 'hourly_forecast_strip.dart';
 
 class WeatherContent extends StatelessWidget {
-  const WeatherContent({super.key, required this.city, required this.weather});
+  const WeatherContent({
+    super.key,
+    required this.city,
+    required this.weather,
+    this.usesGps = false,
+  });
 
   final City city;
   final Weather weather;
+  final bool usesGps;
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +41,28 @@ class WeatherContent extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'CUACA SAAT INI',
-                  style: TextStyle(
-                    color: Color(0xFFC7DCCD),
-                    letterSpacing: 2,
-                    fontSize: 11,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Flexible(
+                      child: Text(
+                        'CUACA SAAT INI',
+                        style: TextStyle(
+                          color: Color(0xFFC7DCCD),
+                          letterSpacing: 2,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      usesGps ? 'GPS' : 'Manual',
+                      style: const TextStyle(
+                        color: Color(0xFFC7DCCD),
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -64,11 +85,15 @@ class WeatherContent extends StatelessWidget {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${city.region}, Indonesia',
-                            style: const TextStyle(color: Color(0xFFC7DCCD)),
-                          ),
+                          if (city.region.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              usesGps || city.region == 'Indonesia'
+                                  ? city.region
+                                  : '${city.region}, Indonesia',
+                              style: const TextStyle(color: Color(0xFFC7DCCD)),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -225,21 +250,7 @@ class WeatherContent extends StatelessWidget {
           'Ketuk salah satu hari untuk melihat detailnya.',
         ),
         const SizedBox(height: 14),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFFE1E7DE)),
-          ),
-          child: Column(
-            children: [
-              for (var i = 0; i < weather.daily.length; i++) ...[
-                if (i > 0) const Divider(height: 1, indent: 18, endIndent: 18),
-                _forecast(context, weather.daily[i], i),
-              ],
-            ],
-          ),
-        ),
+        DailyForecastList(city: city, weather: weather),
         const SizedBox(height: 20),
         const Center(
           child: Text(
@@ -298,6 +309,34 @@ class WeatherContent extends StatelessWidget {
           ],
         ),
       );
+}
+
+class DailyForecastList extends StatelessWidget {
+  const DailyForecastList({
+    super.key,
+    required this.city,
+    required this.weather,
+  });
+
+  final City city;
+  final Weather weather;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(24),
+      border: Border.all(color: const Color(0xFFE1E7DE)),
+    ),
+    child: Column(
+      children: [
+        for (var i = 0; i < weather.daily.length; i++) ...[
+          if (i > 0) const Divider(height: 1, indent: 18, endIndent: 18),
+          _forecast(context, weather.daily[i], i),
+        ],
+      ],
+    ),
+  );
 
   Widget _forecast(
     BuildContext context,

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../models/air_quality.dart';
 import '../models/city.dart';
 import '../models/weather.dart';
 
@@ -22,6 +23,20 @@ class WeatherService {
 
   final http.Client _client;
   final Duration timeout;
+
+  Future<AirQuality> fetchAirQuality(City city) async {
+    final uri = Uri.https('air-quality-api.open-meteo.com', '/v1/air-quality', {
+      'latitude': city.latitude.toString(),
+      'longitude': city.longitude.toString(),
+      'current': ['us_aqi', ...AirQuality.pollutants.keys].join(','),
+      'timezone': 'auto',
+    });
+    try {
+      return AirQuality.fromJson(await _getJson(uri));
+    } on FormatException {
+      throw const WeatherException('Format data kualitas udara tidak valid.');
+    }
+  }
 
   Future<Weather> fetchWeather(City city) async {
     final uri = Uri.https('api.open-meteo.com', '/v1/forecast', {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'screens/weather_screen.dart';
-import 'services/weather_service.dart';
 import 'services/favorites_store.dart';
+import 'services/weather_service.dart';
 
 class LangitKitaApp extends StatelessWidget {
   const LangitKitaApp({super.key, this.service, this.favoritesStore});
@@ -13,19 +13,28 @@ class LangitKitaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const ink = Color(0xFF173E38);
+    const background = Color(0xFFF7F8F2);
     return MaterialApp(
       title: 'LangitKita',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFFF7F8F2),
+        scaffoldBackgroundColor: background,
         colorScheme: ColorScheme.fromSeed(
           seedColor: ink,
           primary: ink,
-          surface: const Color(0xFFF7F8F2),
+          surface: background,
+        ),
+        cardTheme: const CardThemeData(color: Colors.white, elevation: 0),
+        navigationBarTheme: const NavigationBarThemeData(
+          backgroundColor: Colors.white,
+          height: 64,
+          labelTextStyle: WidgetStatePropertyAll(
+            TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+          ),
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFFF7F8F2),
+          backgroundColor: background,
           foregroundColor: ink,
           scrolledUnderElevation: 0,
           centerTitle: false,

@@ -45,7 +45,9 @@ class HourlyForecastStrip extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '${hour.temperature.round()}°',
+                  hour.temperature == null
+                      ? '—'
+                      : '${hour.temperature!.round()}°',
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -53,7 +55,9 @@ class HourlyForecastStrip extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Hujan ${hour.rainProbability}%',
+                  hour.rainProbability == null
+                      ? 'Hujan —'
+                      : 'Hujan ${hour.rainProbability}%',
                   style: const TextStyle(
                     fontSize: 11,
                     color: Color(0xFF64766A),

@@ -93,9 +93,9 @@ class Weather {
       hours.length,
       (i) => HourlyForecast(
         time: _date(hours[i]),
-        temperature: _number(hourly['temperature_2m'][i]),
-        rainProbability: _number(hourly['precipitation_probability'][i])
-            .toInt(),
+        temperature: _optionalNumber(hourly['temperature_2m'][i]),
+        rainProbability: _optionalNumber(hourly['precipitation_probability'][i])
+            ?.toInt(),
         code: _number(hourly['weather_code'][i]).toInt(),
         isDay: _number(hourly['is_day'][i]) == 1,
       ),
@@ -150,11 +150,13 @@ class HourlyForecast {
     required this.isDay,
   });
   final DateTime time;
-  final double temperature;
-  final int rainProbability;
+  final double? temperature;
+  final int? rainProbability;
   final int code;
   final bool isDay;
 }
+
+double? _optionalNumber(dynamic value) => value == null ? null : _number(value);
 
 double _number(dynamic value) {
   if (value is! num || !value.isFinite) {
@@ -167,7 +169,10 @@ DateTime _date(dynamic value) {
   if (value is! String) {
     throw const FormatException('Waktu cuaca tidak valid.');
   }
-  final date = DateTime.tryParse(value);
+  // ISO strings are wall times in the forecast zone; preserve their fields.
+  final date = DateTime.tryParse(
+    value.length == 10 ? '${value}T00:00Z' : '${value}Z',
+  );
   if (date == null) throw const FormatException('Waktu cuaca tidak valid.');
   return date;
 }

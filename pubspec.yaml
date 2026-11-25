@@ -1,7 +1,7 @@
 name: langit_kita
-description: Aplikasi cuaca Indonesia berbasis Open-Meteo untuk UTS Praktikum Mobile.
+description: Aplikasi cuaca, kualitas udara, dan pengingat hujan untuk UAS Mobile Programming.
 publish_to: 'none'
-version: 1.0.0+1
+version: 2.0.0+2
 
 environment:
   sdk: ^3.13.2
@@ -12,6 +12,10 @@ dependencies:
   http: ^1.6.0
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.5.6
+  geolocator: ^14.1.2
+  geocoding: ^4.0.0
+  flutter_local_notifications: 22.3.2
+  timezone: ^0.11.2
 
 dev_dependencies:
   flutter_test:

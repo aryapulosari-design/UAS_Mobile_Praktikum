@@ -5,8 +5,15 @@ import '../services/weather_service.dart';
 import '../widgets/status_panel.dart';
 
 class CitySearchScreen extends StatefulWidget {
-  const CitySearchScreen({super.key, required this.service});
+  const CitySearchScreen({
+    super.key,
+    required this.service,
+    this.favorites = const [],
+    this.onUseLocation,
+  });
   final WeatherService service;
+  final List<City> favorites;
+  final VoidCallback? onUseLocation;
 
   @override
   State<CitySearchScreen> createState() => _CitySearchScreenState();
@@ -73,8 +80,31 @@ class _CitySearchScreenState extends State<CitySearchScreen> {
               icon: const Icon(Icons.search_rounded),
               label: const Text('Cari lokasi'),
             ),
+            if (widget.onUseLocation case final useLocation?) ...[
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  useLocation();
+                },
+                icon: const Icon(Icons.my_location),
+                label: const Text('Gunakan Lokasi Saya'),
+              ),
+            ],
             const SizedBox(height: 24),
-            if (_results == null)
+            if (_results == null && widget.favorites.isNotEmpty) ...[
+              Text(
+                'Kota favorit',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              for (final city in widget.favorites)
+                ListTile(
+                  leading: const Icon(Icons.star_outline),
+                  title: Text(city.name),
+                  subtitle: Text(city.region),
+                  onTap: () => Navigator.pop(context, city),
+                ),
+            ] else if (_results == null)
               const StatusPanel(
                 icon: Icons.travel_explore_rounded,
                 title: 'Mulai dari sebuah kota',
